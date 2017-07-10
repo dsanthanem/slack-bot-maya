@@ -1,0 +1,22 @@
+{
+  "name": "slack-bot-maya",
+  "version": "1.0.0",
+  "description": "Slack BOT named 'Maya'",
+  "main": "server/service.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [
+    "hana",
+    "bot",
+    "slack",
+    "time",
+    "weather"
+  ],
+  "author": "Dinesh Santhanem",
+  "license": "ISC",
+  "dependencies": {
+    "express": "^4.15.3",
+    "winston": "^2.3.1"
+  }
+}

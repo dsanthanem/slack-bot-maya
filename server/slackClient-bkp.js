@@ -1,6 +1,3 @@
-/**
- * Created by dinesh on 10/7/17.
- */
 
 var RtmClient = require('@slack/client').RtmClient;
 var CLIENT_EVENTS = require('@slack/client').CLIENT_EVENTS;

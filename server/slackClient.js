@@ -1,44 +1,52 @@
 'use strict';
 
-const winston = require('winston');
+const logger = require('../lib/logger');
 var RtmClient = require('@slack/client').RtmClient;
 var CLIENT_EVENTS = require('@slack/client').CLIENT_EVENTS;
 var RTM_EVENTS = require('@slack/client').RTM_EVENTS;
-let channel;
 let rtm;
+let nlp;
 
-function handleAuthenticated(rtmStartData) {
-    for (const c of rtmStartData.channels) {
-        if (c.is_member && c.name ==='general') { channel = c.id }
-    }
-    winston.info(`Logged in as ${rtmStartData.self.name} of team ${rtmStartData.team.name}, but not yet connected to a channel`);
+function handleOnAuthenticated(rtmStartData) {
+    logger.info(`Logged in as '${rtmStartData.self.name.toUpperCase()}' of team "${rtmStartData.team.name}", but not yet connected to a channel`);
 }
-function handleRtmConnectionOpened() {
-    // you need to wait for the client to fully connect before you can send messages
-    rtm.sendMessage("Hello..! My name is Maya and i am a Bot.", channel);
+function handleOnRtmMessage(message) {
+    nlp.ask(message.text, (err, res) => {
+        if(err) {
+            logger.exception(err);
+            return;
+        }
+
+        if(!res.intent) {
+            return rtm.sendMessage("Sorry, I don't understand", message.channel);
+
+        }
+
+        if(res.intent[0].value == 'time' && res.location) {
+            return rtm.sendMessage(`I don't yet know the time in ${res.location[0].value}`, message.channel);
+        } else {
+            return rtm.sendMessage("Sorry, I don't understand", message.channel);
+        }
+
+        rtm.sendMessage("Sorry, I don't understand", message.channel);
+    });
 }
-function handleRtmMessage() {
-    rtm.sendMessage("Hi there. Guess am not alone", channel);
-}
+
 
 function addAuthenticatedHandler(rtm, handler) {
     rtm.on(CLIENT_EVENTS.RTM.AUTHENTICATED, handler);
-}
-function addRtmConnectionOpenedHandler(rtm, handler) {
-    rtm.on(CLIENT_EVENTS.RTM.RTM_CONNECTION_OPENED, handler);
 }
 function addRtmMessageHandler(rtm, handler) {
     rtm.on(RTM_EVENTS.MESSAGE, handler);
 }
 
 
-module.exports.init = function slackClient(botToken, logLevel) {
+module.exports.init = function slackClient(botToken, logLevel, nlpClient) {
     rtm = new RtmClient(botToken, {logLevel: logLevel});
-    addAuthenticatedHandler(rtm, handleAuthenticated);
-    addRtmConnectionOpenedHandler(rtm, handleRtmConnectionOpened);
-    addRtmMessageHandler(rtm, handleRtmMessage);
+    nlp = nlpClient;
+    addAuthenticatedHandler(rtm, handleOnAuthenticated);
+    addRtmMessageHandler(rtm, handleOnRtmMessage);
     return rtm;
 };
 module.exports.addAuthenticatedHandler = addAuthenticatedHandler;
-module.exports.addRtmConnectionOpenedHandler = addRtmConnectionOpenedHandler;
 module.exports.addRtmMessageHandler = addRtmMessageHandler;

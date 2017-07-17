@@ -39,6 +39,8 @@ function handleOnRtmMessage(message) {
                 return rtm.sendMessage("Sorry, I don't know what you are talking about", message.channel);
             }
         });
+    } else {
+        return rtm.sendMessage("Are you talking to me? (Include 'Maya' in your question)", message.channel);
     }
 
 }

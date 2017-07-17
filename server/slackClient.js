@@ -11,25 +11,36 @@ function handleOnAuthenticated(rtmStartData) {
     logger.info(`Logged in as '${rtmStartData.self.name.toUpperCase()}' of team "${rtmStartData.team.name}", but not yet connected to a channel`);
 }
 function handleOnRtmMessage(message) {
-    nlp.ask(message.text, (err, res) => {
-        if(err) {
-            logger.exception(err);
-            return;
-        }
 
-        if(!res.intent) {
-            return rtm.sendMessage("Sorry, I don't understand", message.channel);
+    if (message.text.toLowerCase().includes('maya')) {
+        nlp.ask(message.text, (err, res) => {
+            if (err) {
+                logger.exception(err);
+                return;
+            }
 
-        }
+            try {
+                if (!res.intent || !res.intent[0] || !res.intent[0].value) {
+                    throw new Error("Could not extract 'intent'");
+                }
 
-        if(res.intent[0].value == 'time' && res.location) {
-            return rtm.sendMessage(`I don't yet know the time in ${res.location[0].value}`, message.channel);
-        } else {
-            return rtm.sendMessage("Sorry, I don't understand", message.channel);
-        }
+                const intent = require('./intents/' + res.intent[0].value);
+                intent.process(res, function (error, response) {
+                    if (error) {
+                        logger.error(error.message);
+                        return;
+                    }
 
-        rtm.sendMessage("Sorry, I don't understand", message.channel);
-    });
+                    return rtm.sendMessage(response, message.channel);
+                });
+            } catch (err) {
+                logger.error(err);
+                logger.error(res);
+                return rtm.sendMessage("Sorry, I don't know what you are talking about", message.channel);
+            }
+        });
+    }
+
 }
 
 

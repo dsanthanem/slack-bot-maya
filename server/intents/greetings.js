@@ -1,5 +1,7 @@
 'use strict';
 
+const logger = require('../../lib/logger');
+
 module.exports.process = function process(intentData, cb) {
 
     if(intentData.intent[0].value !== 'greetings') {

@@ -5,14 +5,14 @@ const logger = require('../lib/logger');
 const request = require('superagent');
 
 function handleWitResponse(res) {
-    logger.info('Wit Response: %j', res.entities);
+    // logger.info('Wit Response: %j', res.entities);
     return res.entities;
 }
 
 module.exports = function witClient(token) {
     const ask = function ask(message, cbErr) {
-        logger.info(`Ask Message - ${message}`);
-        logger.info(`Wit Token - ${token}`);
+        // logger.info(`Ask Message - ${message}`);
+        // logger.info(`Wit Token - ${token}`);
         request.get('https://api.wit.ai/message')
             .set('Authorization', 'Bearer ' + token)
             .query({v: '13/07/2017'})

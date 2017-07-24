@@ -47,7 +47,7 @@ class ServiceRegistry {
 
         for(let key in this._services) {
             if(this._services[key].timestamp + this._timeout < currTimestamp) {
-                remove(this._services[key].intent, this._services[key].ip, this._services[key].port);
+                this.remove(this._services[key].intent, this._services[key].ip, this._services[key].port);
             }
         }
     }

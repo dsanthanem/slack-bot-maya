@@ -12,5 +12,5 @@ module.exports.process = function process(intentData, registry, cb) {
         return cb(new Error(`Did you say greetings to me?`));
     }
 
-    return cb(false, `Hello there, ${intentData.contact[0].value}. How are you doing?`);
+    return cb(false, `Hello there, How are you doing?`);
 };
